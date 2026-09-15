@@ -40,15 +40,27 @@ public class TransaccionServicio {
 
         CuentaEntidad cuentaDestino = null;
 
-        switch (dto.tipoTransaccion()) {
+        // Se usa toUpperCase() para evitar errores de case-sensitivity desde el frontend
+        switch (dto.tipoTransaccion().toUpperCase()) {
             case "INGRESO":
                 cuentaOrigen.setSaldoActual(cuentaOrigen.getSaldoActual().add(dto.monto()));
                 break;
+                
             case "EGRESO":
+                if (cuentaOrigen.getSaldoActual().compareTo(dto.monto()) < 0) {
+                    throw new RuntimeException("Saldo insuficiente en la cuenta de origen para este egreso");
+                }
                 cuentaOrigen.setSaldoActual(cuentaOrigen.getSaldoActual().subtract(dto.monto()));
                 break;
+                
             case "TRANSFERENCIA":
-                if (dto.cuentaDestinoId() == null) throw new IllegalArgumentException("La cuenta destino es obligatoria en transferencias");
+                if (dto.cuentaDestinoId() == null) {
+                    throw new IllegalArgumentException("La cuenta destino es obligatoria en transferencias");
+                }
+                if (cuentaOrigen.getSaldoActual().compareTo(dto.monto()) < 0) {
+                    throw new RuntimeException("Saldo insuficiente para realizar la transferencia");
+                }
+                
                 cuentaDestino = cuentaRepositorio.findById(dto.cuentaDestinoId())
                         .orElseThrow(() -> new RuntimeException("Cuenta destino no encontrada"));
 
@@ -56,8 +68,9 @@ public class TransaccionServicio {
                 cuentaDestino.setSaldoActual(cuentaDestino.getSaldoActual().add(dto.monto()));
                 cuentaRepositorio.save(cuentaDestino);
                 break;
+                
             default:
-                throw new IllegalArgumentException("Tipo de transacción no válido");
+                throw new IllegalArgumentException("Tipo de transacción no válido. Use INGRESO, EGRESO o TRANSFERENCIA");
         }
 
         cuentaRepositorio.save(cuentaOrigen);
@@ -67,7 +80,7 @@ public class TransaccionServicio {
                 .cuentaOrigen(cuentaOrigen)
                 .cuentaDestino(cuentaDestino)
                 .categoria(categoria)
-                .tipoTransaccion(dto.tipoTransaccion())
+                .tipoTransaccion(dto.tipoTransaccion().toUpperCase()) // Guardamos siempre normalizado
                 .monto(dto.monto())
                 .descripcion(dto.descripcion())
                 .fechaMovimiento(dto.fechaMovimiento())

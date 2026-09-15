@@ -5,6 +5,7 @@ import com.example.finanzasbackend.modulos.cuenta.CuentaEntidad;
 import com.example.finanzasbackend.modulos.usuario.UsuarioEntidad;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
