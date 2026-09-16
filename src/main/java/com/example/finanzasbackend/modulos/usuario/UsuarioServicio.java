@@ -20,9 +20,29 @@ public class UsuarioServicio {
         return usuarioRepositorio.findById(id);
     }
 
-    public UsuarioEntidad guardarUsuario(UsuarioEntidad usuario) {
-        return usuarioRepositorio.save(usuario);
+   public UsuarioEntidad guardarUsuario(UsuarioEntidad usuario) {
+    if (usuario.getId() == null) {
+        throw new IllegalArgumentException("El id (UUID de Supabase Auth) es obligatorio");
     }
+    if (usuario.getCorreo() == null || usuario.getCorreo().isBlank()) {
+        throw new IllegalArgumentException("El correo es obligatorio");
+    }
+    if (usuario.getNombreCompleto() == null || usuario.getNombreCompleto().isBlank()) {
+        throw new IllegalArgumentException("El nombre completo es obligatorio");
+    }
+    if (usuario.getMonedaPreferida() == null || usuario.getMonedaPreferida().isBlank()) {
+        usuario.setMonedaPreferida("USD");
+    }
+
+    return usuarioRepositorio.findById(usuario.getId())
+            .map(existente -> {
+                existente.setNombreCompleto(usuario.getNombreCompleto());
+                existente.setCorreo(usuario.getCorreo());
+                existente.setMonedaPreferida(usuario.getMonedaPreferida());
+                return usuarioRepositorio.save(existente);
+            })
+            .orElseGet(() -> usuarioRepositorio.save(usuario));
+}
 
     public UsuarioEntidad actualizarUsuario(UUID id, UsuarioEntidad detallesUsuario) {
         UsuarioEntidad usuario = usuarioRepositorio.findById(id)

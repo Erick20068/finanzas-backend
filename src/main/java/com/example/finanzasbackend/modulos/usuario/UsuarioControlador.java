@@ -28,9 +28,14 @@ public class UsuarioControlador {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioEntidad> crearUsuario(@RequestBody UsuarioEntidad usuario) {
-        UsuarioEntidad nuevoUsuario = usuarioServicio.guardarUsuario(usuario);
-        return ResponseEntity.ok(nuevoUsuario);
+    public ResponseEntity<?> crearUsuario(@RequestBody UsuarioEntidad usuario) {
+    try {
+        return ResponseEntity.ok(usuarioServicio.guardarUsuario(usuario));
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(java.util.Map.of(
+            "message", e.getMessage() != null ? e.getMessage() : "Error al crear usuario"
+        ));
+    }
     }
 
     @PutMapping("/{id}")
