@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @EnableWebSecurity
 public class ConfiguracionSeguridad {
 
-    @Value("${supabase.jwks.uri}")
+    @Value("${SUPABASE_JWKS_URL:https://bwyddteiwyhpvmpbvdgs.supabase.co/auth/v1/.well-known/jwks.json}")
     private String jwksUri;
 
     @Bean
