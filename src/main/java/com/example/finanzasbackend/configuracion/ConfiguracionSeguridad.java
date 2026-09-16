@@ -3,6 +3,7 @@ package com.example.finanzasbackend.configuracion;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,12 +25,13 @@ public class ConfiguracionSeguridad {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource)) // Conecta con tu archivo ConfiguracionCors
-            .csrf(csrf -> csrf.disable()) // Desactivado porque usamos JWT, no cookies
+            .cors(cors -> cors.configurationSource(corsConfigurationSource)) 
+            .csrf(csrf -> csrf.disable())  
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/publico/**").permitAll() // Rutas que no requieren login
-                .anyRequest().authenticated() // Obliga a que TODAS las demás rutas tengan un token válido
+                .requestMatchers("/api/publico/**").permitAll() 
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() 
+                .anyRequest().authenticated() 
             )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.decoder(jwtDecoder()))
