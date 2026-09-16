@@ -26,7 +26,7 @@ public class ReporteEmailControlador {
 
     @PostMapping("/enviar")
     public ResponseEntity<?> enviar(@AuthenticationPrincipal Jwt jwt,
-                                     @RequestBody Map<String, Object> body) {
+                                    @RequestBody Map<String, Object> body) {
         try {
             String email = jwt.getClaimAsString("email");
             if (email == null || email.isBlank()) {

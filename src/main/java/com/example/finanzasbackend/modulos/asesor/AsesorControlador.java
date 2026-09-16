@@ -16,10 +16,8 @@ public class AsesorControlador {
 
     @PostMapping
     public ResponseEntity<Map<String, String>> consultar(@RequestBody Map<String, Object> body) {
-        // Llamamos al servicio de IA
         String respuestaIA = asesorServicio.consultarIA(body);
         
-        // Devolvemos el JSON que el frontend de React espera: { "respuesta": "texto..." }
         Map<String, String> response = new HashMap<>();
         response.put("respuesta", respuestaIA);
         
